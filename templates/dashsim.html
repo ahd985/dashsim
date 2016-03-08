@@ -41,9 +41,8 @@
           <div class="chart-title">
             Cell Title
           </div>
-          <div class="chart-stage">
-            <div id="grid-1-1">
-              <img data-src="holder.js/100%x240/white/text:#grid-1-1">
+          <div class="chart-stage" id="chart-stage-1">
+            <div id="chart-1" style="width: 480px; max-height: 400px;">
             </div>
           </div>
           <div class="chart-notes">
@@ -166,6 +165,9 @@
 
   <script type="text/javascript" src='{{ static_url("js/keen.min.js") }}'></script>
   <script type="text/javascript" src='{{ static_url("js/meta.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/plotly-latest.min.js") }}'></script>
+  <script type="text/javascript"> var data = {% raw messages %} </script>
+  <script type="text/javascript" src='{{ static_url("js/dashsim.js") }}'></script>
 
 </body>
 </html>
