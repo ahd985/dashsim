@@ -3,8 +3,8 @@
 <head>
   <title>Layouts &raquo; Hero-Thirds</title>
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
-  <link rel="stylesheet" type="text/css" href="../../assets/lib/bootstrap/dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" type="text/css" href="../../assets/css/keen-dashboards.css" />
+  <link rel="stylesheet" type="text/css" href='{{ static_url("css/bootstrap.min.css") }}' />
+  <link rel="stylesheet" type="text/css" href='{{ static_url("css/keen-dashboards.css") }}' />
 </head>
 <body class="application">
 
@@ -156,16 +156,16 @@
 
   </div>
 
-  <script type="text/javascript" src="../../assets/lib/jquery/dist/jquery.min.js"></script>
-  <script type="text/javascript" src="../../assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src='{{ static_url("js/jquery.min.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/bootstrap.min.js") }}'></script>
 
-  <script type="text/javascript" src="../../assets/lib/holderjs/holder.js"></script>
+  <script type="text/javascript" src='{{ static_url("js/holder.js") }}'></script>
   <script>
     Holder.add_theme("white", { background:"#fff", foreground:"#a7a7a7", size:10 });
   </script>
 
-  <script type="text/javascript" src="../../assets/lib/keen-js/dist/keen.min.js"></script>
-  <script type="text/javascript" src="../../assets/js/meta.js"></script>
+  <script type="text/javascript" src='{{ static_url("js/keen.min.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/meta.js") }}'></script>
 
 </body>
 </html>
