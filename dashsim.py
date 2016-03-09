@@ -95,18 +95,18 @@ class DataCollectorMeta(metaclass=abc.ABCMeta):
     # Enhance to include more functionality
     @staticmethod
     def find_files(root_dir, extensions, names, include_regex, omit_regex, traverse=True, max_traverse=-1):
-        file_list = []
+        file_list = set()
         root_level = 0
 
         for root, dirs, files in os.path.walk(root_dir):
             for ext in extensions:
-                file_list.append(glob.glob(os.path.join(root,"*." + str(ext))))
+                file_list.update(glob.glob(os.path.join(root,"*." + str(ext))))
 
             for name in names:
-                file_list.append(glob.glob(os.path.join(root,name + "*")))
+                file_list.update(glob.glob(os.path.join(root,name + "*")))
 
             for regex in include_regex:
-                file_list.append(glob.glob(os.path.join(root,regex)))
+                file_list.update(glob.glob(os.path.join(root,regex)))
 
             if not traverse:
                 break
@@ -114,11 +114,11 @@ class DataCollectorMeta(metaclass=abc.ABCMeta):
             if root_level > -1 and root_level >= max_traverse:
                 break
 
-            traverse_level += 1
+            root_level += 1
 
         # Use omit_regex to filter out any files not wanted
         for regex in omit_regex:
-            file_list = [f for f in file_list if not re.match(regex, f)]
+            file_list = [f for f in file_list if not re.match(regex, f) is None]
 
         return file_list
 
