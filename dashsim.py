@@ -1,6 +1,10 @@
+import abc
+import glob
 import json
 import os.path
+import re
 
+import pandas as pd
 import tornado.escape
 import tornado.ioloop
 import tornado.web
@@ -13,7 +17,6 @@ class UpdateHandler(tornado.web.RequestHandler):
         self._data = data
 
     def post(self):
-        # Use self.write('...') to return html/js/json
         pass
 
 
@@ -42,7 +45,21 @@ class DashSim:
         if chart_id in self.cache:
             self.cache[chart_id] = chart_data
 
+    def set_collector(self, collector):
+        if not isinstance():
+            raise TypeError('The "collector" input must inherit "DataCollectorMeta" meta class.')
+
+        self.collector = collector
+
+    def call_collector(self):
+        if not hasattr(self, 'collector'):
+            raise AttributeError('Please provide a data collector class via the "set_collector" class method.')
+
+        self.cache = self.collector.collect_data(*args, **kwargs)
+
     def start_server(self, port=8888):
+        self.call_collector()
+
         define("port", default=port, help="run on the given port", type=int)
         app = tornado.web.Application(
             [
@@ -55,6 +72,56 @@ class DashSim:
         app.listen(options.port)
         tornado.ioloop.IOLoop.current().start()
 
+class DataCollectorMeta(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def collect_data(self, *args, **kwargs):
+        """Abstract method that must be implemented for data collection"""
+        return
+
+    # Wrapper methods for pandas data readers
+    @staticmethod
+    def read_csv(*args, **kwargs):
+        return pd.read_csv(*args, **kwargs)
+    @staticmethod
+    def read_excel(*args, **kwargs):
+        return pd.read_excel(*args, **kwargs)
+    @staticmethod
+    def read_json(*args, **kwargs):
+        return pd.read_json(*args, **kwargs)
+    @staticmethod
+    def read_hdf(*args, **kwargs):
+        return pd.read_hdf(*args, **kwargs)
+
+    # File searching convenience method
+    # Enhance to include more functionality
+    @staticmethod
+    def find_files(root_dir, extensions, names, include_regex, omit_regex, traverse=True, max_traverse=-1):
+        file_list = []
+        root_level = 0
+
+        for root, dirs, files in os.path.walk(root_dir):
+            for ext in extensions:
+                file_list.append(glob.glob(os.path.join(root,"*." + str(ext))))
+
+            for name in names:
+                file_list.append(glob.glob(os.path.join(root,name + "*")))
+
+            for regex in include_regex:
+                file_list.append(glob.glob(os.path.join(root,regex)))
+
+            if not traverse:
+                break
+
+            if root_level > -1 and root_level >= max_traverse:
+                break
+
+            traverse_level += 1
+
+        # Use omit_regex to filter out any files not wanted
+        for regex in omit_regex:
+            file_list = [f for f in file_list if not re.match(regex, f)]
+
+        return file_list
 
 
 
