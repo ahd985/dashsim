@@ -1,56 +1,50 @@
 import abc
 import glob
-import json
 import os.path
 import re
 
 import pandas as pd
+import plotly.offline as py
+import plotly.graph_objs as go
 import tornado.escape
 import tornado.ioloop
 import tornado.web
+
 
 from tornado.escape import json_encode
 from tornado.options import define, options
 
 class UpdateHandler(tornado.web.RequestHandler):
-    def initialize(self, data):
-        self._data = data
+    def initialize(self, plots):
+        self._plots = plots
 
     def post(self):
         pass
 
 
 class MainHandler(tornado.web.RequestHandler):
-    def initialize(self, data):
-        self._data = data
+    def initialize(self, plots):
+        self._plots = plots
 
     def get(self):
-        self.render("dashsim.html", messages=json_encode(self._data))
+        self.render("dashsim.html", plots=self._plots)
 
 
 class DashSim:
     def __init__(self):
-        self.cache = {}
+        self.rendered_plots = []
         self.collector_kwargs = {}
 
-    def add_chart(self, chart_id):
-        self.cache[chart_id] = {}
-
-    def del_chart(self, chart_id):
-        if chart_id in self.cache:
-            del self.cache[chart_id]
-
     def set_collector(self, collector):
-        if not issubclass(collector, DataCollectorMeta):
-            raise TypeError('The "collector" input must inherit "DataCollectorMeta" meta class.')
-
-        self.collector = collector
+        self.collector = collector()
 
     def call_collector(self):
         if not hasattr(self, 'collector'):
             raise AttributeError('Please provide a data collector class via the "set_collector" class method.')
 
-        self.cache = self.collector.collect_data(self.collector_kwargs)
+        self.collector.collect_data()
+        for plot in self.collector.plots:
+            self.rendered_plots.append(py.plot(plot, output_type='div', include_plotlyjs=False, link_text=''))
 
     # Future implementation
     def set_collector_kwargs(self, collector_kwargs):
@@ -62,8 +56,8 @@ class DashSim:
         define("port", default=port, help="run on the given port", type=int)
         app = tornado.web.Application(
             [
-                (r"/", MainHandler, dict(data=self.cache)),
-                (r"/update", UpdateHandler, dict(data=self.cache)),
+                (r"/", MainHandler, dict(plots=self.rendered_plots)),
+                (r"/update", UpdateHandler, dict(plots=self.rendered_plots)),
             ],
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
@@ -71,7 +65,13 @@ class DashSim:
         app.listen(options.port)
         tornado.ioloop.IOLoop.current().start()
 
+
 class DataCollectorMeta(metaclass=abc.ABCMeta):
+    # Initialize plotly graph object wrapper
+    def __init__(self):
+        self.go = go
+        self.plots = []
+
     @abc.abstractmethod
     def collect_data(self, **kwargs):
         """Abstract method that must be implemented for data collection"""
@@ -121,6 +121,7 @@ class DataCollectorMeta(metaclass=abc.ABCMeta):
             file_list = [f for f in file_list if not re.match(regex, f) is None]
 
         return file_list
+
 
 
 

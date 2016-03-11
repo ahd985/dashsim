@@ -5,30 +5,14 @@
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
   <link rel="stylesheet" type="text/css" href='{{ static_url("css/bootstrap.min.css") }}' />
   <link rel="stylesheet" type="text/css" href='{{ static_url("css/keen-dashboards.css") }}' />
+  <script type="text/javascript" src='{{ static_url("js/plotly-latest.min.js") }}'></script>
 </head>
 <body class="application">
 
   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="../">
-          <span class="glyphicon glyphicon-chevron-left"></span>
-        </a>
-        <a class="navbar-brand" href="./">Layouts &raquo; Hero Thirds</a>
-      </div>
-      <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav navbar-left">
-          <li><a href="https://keen.io">Home</a></li>
-          <li><a href="https://keen.io/team">Team</a></li>
-          <li><a href="https://github.com/keenlabs/dashboards/tree/gh-pages/layouts/hero-thirds">Source</a></li>
-          <li><a href="https://groups.google.com/forum/#!forum/keen-io-devs">Community</a></li><li><a href="http://stackoverflow.com/questions/tagged/keen-io?sort=newest&pageSize=15">Technical Support</a></li>
-        </ul>
+        <a class="navbar-brand" href="./">DashSim</a>
       </div>
     </div>
   </div>
@@ -36,118 +20,27 @@
   <div class="container-fluid">
 
     <div class="row">
-      <div class="col-sm-8">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Cell Title
-          </div>
-          <div class="chart-stage" id="chart-stage-1">
-            <div id="chart-1" style="width: 480px; max-height: 400px;">
-            </div>
-          </div>
-          <div class="chart-notes">
-            Notes about this chart
-          </div>
-        </div>
+    {% for i in range(len(plots)) %}
+      {% if i % 3 == 0 %}
       </div>
+      <div class="row">
+      {% end if %}
       <div class="col-sm-4">
         <div class="chart-wrapper">
           <div class="chart-title">
             Cell Title
           </div>
           <div class="chart-stage">
-            <img data-src="holder.js/100%x240/white">
+            {% raw plots[i] %}
           </div>
           <div class="chart-notes">
             Notes about this chart
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-6 col-md-4">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Cell Title
-          </div>
-          <div class="chart-stage">
-            <img data-src="holder.js/100%x120/white">
-          </div>
-          <div class="chart-notes">
-            Notes about this chart
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-md-4">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Cell Title
-          </div>
-          <div class="chart-stage">
-            <img data-src="holder.js/100%x120/white">
-          </div>
-          <div class="chart-notes">
-            Notes about this chart
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-md-4">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Cell Title
-          </div>
-          <div class="chart-stage">
-            <img data-src="holder.js/100%x120/white">
-          </div>
-          <div class="chart-notes">
-            Notes about this chart
-          </div>
-        </div>
-      </div>
-<!-- end of three -->
-      <div class="col-sm-6 col-md-4">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Cell Title
-          </div>
-          <div class="chart-stage">
-            <img data-src="holder.js/100%x120/white">
-          </div>
-          <div class="chart-notes">
-            Notes about this chart
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-md-4">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Cell Title
-          </div>
-          <div class="chart-stage">
-            <img data-src="holder.js/100%x120/white">
-          </div>
-          <div class="chart-notes">
-            Notes about this chart
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-md-4">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Cell Title
-          </div>
-          <div class="chart-stage">
-            <img data-src="holder.js/100%x120/white">
-          </div>
-          <div class="chart-notes">
-            Notes about this chart
-          </div>
-        </div>
-      </div>
+    {% end for %}
     </div>
   </div>
-
 
     <hr>
 
@@ -165,8 +58,6 @@
 
   <script type="text/javascript" src='{{ static_url("js/keen.min.js") }}'></script>
   <script type="text/javascript" src='{{ static_url("js/meta.js") }}'></script>
-  <script type="text/javascript" src='{{ static_url("js/plotly-latest.min.js") }}'></script>
-  <script type="text/javascript"> var data = {% raw messages %} </script>
   <script type="text/javascript" src='{{ static_url("js/dashsim.js") }}'></script>
 
 </body>
