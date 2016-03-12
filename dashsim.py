@@ -44,7 +44,10 @@ class DashSim:
 
         self.collector.collect_data()
         for plot in self.collector.plots:
-            self.rendered_plots.append(py.plot(plot, output_type='div', include_plotlyjs=False, link_text=''))
+            # Render html
+            html = py.plot(plot['plot'], output_type='div', include_plotlyjs=False, link_text='')
+
+            self.rendered_plots.append(dict(html=html, col_width=plot['col_width']))
 
     # Future implementation
     def set_collector_kwargs(self, collector_kwargs):
@@ -76,6 +79,9 @@ class DataCollectorMeta(metaclass=abc.ABCMeta):
     def collect_data(self, **kwargs):
         """Abstract method that must be implemented for data collection"""
         return
+
+    def add_plot(self, plot, col_width=None):
+        self.plots.append(dict(plot=plot, col_width=col_width))
 
     # Wrapper methods for pandas data readers
     @staticmethod

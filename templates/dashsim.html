@@ -20,24 +20,29 @@
   <div class="container-fluid">
 
     <div class="row">
+    {% set j=0 %}
     {% for i in range(len(plots)) %}
-      {% if i % 3 == 0 %}
-      </div>
-      <div class="row">
+      {% if j + plots[i]['col_width'] > 12 %}
+        {% set j=0 %}
+        </div>
+        <div class="row">
       {% end if %}
-      <div class="col-sm-4">
+      <div class="col-sm-{{ plots[i]['col_width'] }}">
         <div class="chart-wrapper">
+          <!-- Optional chart title area
           <div class="chart-title">
             Cell Title
-          </div>
+          </div> -->
           <div class="chart-stage">
-            {% raw plots[i] %}
+            {% raw plots[i]['html'] %}
           </div>
+          <!-- Optional chart note area
           <div class="chart-notes">
             Notes about this chart
-          </div>
+          </div> -->
         </div>
       </div>
+      {% set j=j+plots[i]['col_width']  %}
     {% end for %}
     </div>
   </div>

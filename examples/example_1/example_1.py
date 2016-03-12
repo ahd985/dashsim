@@ -1,7 +1,10 @@
 import json
 import sys
 sys.path.append("../../")
+
+
 import dashsim
+import pandas as pd
 
 
 # Initialize DashSim
@@ -12,12 +15,24 @@ dash = dashsim.DashSim()
 class DataCollector(dashsim.DataCollectorMeta):
     def collect_data(self):
         df = self.read_csv('standard_n.csv', header=[0, 1, 2])
-        # Collapse multi-column to one column
-        df.columns = [', '.join(col).strip() for col in df.columns.values]
+        df.columns = pd.MultiIndex.from_tuples([(col[0], col[2]) if 'Unnamed' in col[1] else
+                      (', '.join(col[:2]), col[2]) for col in df.columns.values])
+        df = df.set_index([df.columns.values[0]])
+        df = df.sortlevel(level=1, axis=1)
 
-        for col in df.columns[1:]:
-            trace = self.go.Scatter(x=df[df.columns[0]], y=df[col])
-            self.plots.append([trace])
+        df = df.swaplevel(0, 1, axis=1)
+
+        for unit, unit_df in df.groupby(level=0, axis=1):
+            data = []
+            layout = dict(
+                xaxis=dict(title=', '.join(df.index.name)),
+                yaxis=dict(title=unit),
+            )
+            for col in unit_df:
+                data.append(self.go.Scatter(x=df.index.values, y=df[col], name=col[1]))
+
+            # Note - max col_width is 12
+            self.add_plot(dict(data=data, layout=layout), col_width=6)
 
 dash.set_collector(DataCollector)
 
