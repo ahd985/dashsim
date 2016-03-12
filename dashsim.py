@@ -80,7 +80,22 @@ class DataCollectorMeta(metaclass=abc.ABCMeta):
         """Abstract method that must be implemented for data collection"""
         return
 
-    def add_plot(self, plot, col_width=None):
+    def add_plot(self, plot, col_width=None, height_mult=None):
+        if height_mult is not None:
+            base_height = 500
+            new_height = base_height * height_mult
+
+            if isinstance(plot, dict):
+                if 'layout' in plot:
+                    if 'height' in plot['layout']:
+                        plot['layout']['height'] *= height_mult
+                    else:
+                        plot['layout']['height'] = new_height
+                else:
+                    plot['layout'] = dict(height=new_height)
+            else:
+                plot = dict(data=plot, layout=dict(height=new_height))
+
         self.plots.append(dict(plot=plot, col_width=col_width))
 
     # Wrapper methods for pandas data readers

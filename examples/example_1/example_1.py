@@ -32,7 +32,7 @@ class DataCollector(dashsim.DataCollectorMeta):
                 data.append(self.go.Scatter(x=df.index.values, y=df[col], name=col[1]))
 
             # Note - max col_width is 12
-            self.add_plot(dict(data=data, layout=layout), col_width=6)
+            self.add_plot(dict(data=data, layout=layout), col_width=6, height_mult=1)
 
 dash.set_collector(DataCollector)
 
