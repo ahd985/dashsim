@@ -2,10 +2,14 @@ import abc
 import glob
 import os.path
 import re
+# Temporary - for SSV import
+import sys
+sys.path.append('/Users/Alex/Documents/Python Projects/ssv')
 
 import pandas as pd
 import plotly.offline as py
 import plotly.graph_objs as go
+from ssv.ssv import Vis
 import tornado.escape
 import tornado.ioloop
 import tornado.web
@@ -15,24 +19,24 @@ from tornado.escape import json_encode
 from tornado.options import define, options
 
 class UpdateHandler(tornado.web.RequestHandler):
-    def initialize(self, plots):
-        self._plots = plots
+    def initialize(self, visualizations):
+        self._visualizations = visualizations
 
     def post(self):
         pass
 
 
 class MainHandler(tornado.web.RequestHandler):
-    def initialize(self, plots):
-        self._plots = plots
+    def initialize(self, visualizations):
+        self._visualizations = visualizations
 
     def get(self):
-        self.render("dashsim.html", plots=self._plots)
+        self.render("dashsim.html", visualizations=self._visualizations)
 
 
 class DashSim:
     def __init__(self):
-        self.rendered_plots = []
+        self.rendered_visualizations = []
         self.collector_kwargs = {}
 
     def set_collector(self, collector):
@@ -43,11 +47,15 @@ class DashSim:
             raise AttributeError('Please provide a data collector class via the "set_collector" class method.')
 
         self.collector.collect_data()
-        for plot in self.collector.plots:
+        for vis in self.collector.visualizations:
             # Render html
-            html = py.plot(plot['plot'], output_type='div', include_plotlyjs=False, link_text='')
+            html = ''
+            if isinstance(vis['visualization'], dict):
+                html = py.plot(vis['visualization'], output_type='div', include_plotlyjs=False, link_text='')
+            elif type(vis['visualization']) == Vis:
+                html = vis['visualization'].render_model(mode='html')
 
-            self.rendered_plots.append(dict(html=html, col_width=plot['col_width']))
+            self.rendered_visualizations.append(dict(html=html, col_width=vis['col_width']))
 
     # Future implementation
     def set_collector_kwargs(self, collector_kwargs):
@@ -59,8 +67,8 @@ class DashSim:
         define("port", default=port, help="run on the given port", type=int)
         app = tornado.web.Application(
             [
-                (r"/", MainHandler, dict(plots=self.rendered_plots)),
-                (r"/update", UpdateHandler, dict(plots=self.rendered_plots)),
+                (r"/", MainHandler, dict(visualizations=self.rendered_visualizations)),
+                (r"/update", UpdateHandler, dict(visualizations=self.rendered_visualizations)),
             ],
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
@@ -73,30 +81,32 @@ class DataCollectorMeta(metaclass=abc.ABCMeta):
     # Initialize plotly graph object wrapper
     def __init__(self):
         self.go = go
-        self.plots = []
+        self.visualizations = []
 
     @abc.abstractmethod
     def collect_data(self, **kwargs):
         """Abstract method that must be implemented for data collection"""
         return
 
-    def add_plot(self, plot, col_width=None, height_mult=None):
+    def add_visualization(self, visualization, col_width=None, height_mult=None):
         if height_mult is not None:
             base_height = 500
             new_height = base_height * height_mult
 
-            if isinstance(plot, dict):
-                if 'layout' in plot:
-                    if 'height' in plot['layout']:
-                        plot['layout']['height'] *= height_mult
+            if isinstance(visualization, dict):
+                if 'layout' in visualization:
+                    if 'height' in visualization['layout']:
+                        visualization['layout']['height'] *= height_mult
                     else:
-                        plot['layout']['height'] = new_height
+                        visualization['layout']['height'] = new_height
                 else:
-                    plot['layout'] = dict(height=new_height)
+                    visualization['layout'] = dict(height=new_height)
+            elif type(visualization) == Vis:
+                pass
             else:
-                plot = dict(data=plot, layout=dict(height=new_height))
+                visualization = dict(data=visualization, layout=dict(height=new_height))
 
-        self.plots.append(dict(plot=plot, col_width=col_width))
+        self.visualizations.append(dict(visualization=visualization, col_width=col_width))
 
     # Wrapper methods for pandas data readers
     @staticmethod

@@ -4,8 +4,16 @@
   <title>Layouts &raquo; Hero-Thirds</title>
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
   <link rel="stylesheet" type="text/css" href='{{ static_url("css/bootstrap.min.css") }}' />
+  <link rel="stylesheet" type="text/css" href='{{ static_url("css/jquery-ui.css") }}' />
   <link rel="stylesheet" type="text/css" href='{{ static_url("css/keen-dashboards.css") }}' />
   <script type="text/javascript" src='{{ static_url("js/plotly-latest.min.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/jquery.min.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/jquery-ui.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/bootstrap.min.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/keen.min.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/dashsim.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/ssv.js") }}'></script>
+  <script type="text/javascript" src='{{ static_url("js/d3.min.js") }}'></script>
 </head>
 <body class="application">
 
@@ -21,20 +29,20 @@
 
     <div class="row">
     {% set j=0 %}
-    {% for i in range(len(plots)) %}
-      {% if j + plots[i]['col_width'] > 12 %}
+    {% for i in range(len(visualizations)) %}
+      {% if j + visualizations[i]['col_width'] > 12 %}
         {% set j=0 %}
         </div>
         <div class="row">
       {% end if %}
-      <div class="col-sm-{{ plots[i]['col_width'] }}">
+      <div class="col-sm-{{ visualizations[i]['col_width'] }}">
         <div class="chart-wrapper">
           <!-- Optional chart title area
           <div class="chart-title">
             Cell Title
           </div> -->
           <div class="chart-stage">
-            {% raw plots[i]['html'] %}
+            {% raw visualizations[i]['html'] %}
           </div>
           <!-- Optional chart note area
           <div class="chart-notes">
@@ -42,7 +50,7 @@
           </div> -->
         </div>
       </div>
-      {% set j=j+plots[i]['col_width']  %}
+      {% set j=j+visualizations[i]['col_width']  %}
     {% end for %}
     </div>
   </div>
@@ -52,18 +60,5 @@
     <p class="small text-muted">Built with &#9829; by <a href="https://keen.io">Keen IO</a></p>
 
   </div>
-
-  <script type="text/javascript" src='{{ static_url("js/jquery.min.js") }}'></script>
-  <script type="text/javascript" src='{{ static_url("js/bootstrap.min.js") }}'></script>
-
-  <script type="text/javascript" src='{{ static_url("js/holder.js") }}'></script>
-  <script>
-    Holder.add_theme("white", { background:"#fff", foreground:"#a7a7a7", size:10 });
-  </script>
-
-  <script type="text/javascript" src='{{ static_url("js/keen.min.js") }}'></script>
-  <script type="text/javascript" src='{{ static_url("js/meta.js") }}'></script>
-  <script type="text/javascript" src='{{ static_url("js/dashsim.js") }}'></script>
-
 </body>
 </html>
